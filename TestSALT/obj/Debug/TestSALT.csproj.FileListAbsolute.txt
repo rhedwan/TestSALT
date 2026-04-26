@@ -15,3 +15,20 @@ C:\Users\Ebun Fasina\Documents\Visual Studio 2019\TestSALT\TestSALT\obj\Debug\Te
 C:\Users\Ebun Fasina\Documents\Visual Studio 2019\TestSALT\TestSALT\obj\Debug\TestSALT.csproj.CopyComplete
 C:\Users\Ebun Fasina\Documents\Visual Studio 2019\TestSALT\TestSALT\obj\Debug\TestSALT.exe
 C:\Users\Ebun Fasina\Documents\Visual Studio 2019\TestSALT\TestSALT\obj\Debug\TestSALT.pdb
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\TestSALT.exe.config
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\TestSALT.exe
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\TestSALT.pdb
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\SALT.dll
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\SALTx.dll
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\Simlib.dll
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\SALTx.pdb
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\SALT.pdb
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\bin\Debug\Simlib.pdb
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\obj\Debug\TestSALT.csproj.AssemblyReference.cache
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\obj\Debug\TestSALT.Form1.resources
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\obj\Debug\TestSALT.Properties.Resources.resources
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\obj\Debug\TestSALT.csproj.GenerateResource.cache
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\obj\Debug\TestSALT.csproj.CoreCompileInputs.cache
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\obj\Debug\TestSALT.csproj.Up2Date
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\obj\Debug\TestSALT.exe
+C:\Users\SAIC2\Documents\GitHub\TestSALT\TestSALT\obj\Debug\TestSALT.pdb

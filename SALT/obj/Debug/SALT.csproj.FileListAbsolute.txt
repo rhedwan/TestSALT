@@ -4,3 +4,9 @@ C:\Users\Ebun Fasina\Documents\Visual Studio 2019\TestSALT\SALT\obj\Debug\SALT.c
 C:\Users\Ebun Fasina\Documents\Visual Studio 2019\TestSALT\SALT\obj\Debug\SALT.csproj.CoreCompileInputs.cache
 C:\Users\Ebun Fasina\Documents\Visual Studio 2019\TestSALT\SALT\obj\Debug\SALT.dll
 C:\Users\Ebun Fasina\Documents\Visual Studio 2019\TestSALT\SALT\obj\Debug\SALT.pdb
+C:\Users\SAIC2\Documents\GitHub\TestSALT\SALT\bin\Debug\SALT.dll
+C:\Users\SAIC2\Documents\GitHub\TestSALT\SALT\bin\Debug\SALT.pdb
+C:\Users\SAIC2\Documents\GitHub\TestSALT\SALT\obj\Debug\SALT.csproj.AssemblyReference.cache
+C:\Users\SAIC2\Documents\GitHub\TestSALT\SALT\obj\Debug\SALT.csproj.CoreCompileInputs.cache
+C:\Users\SAIC2\Documents\GitHub\TestSALT\SALT\obj\Debug\SALT.dll
+C:\Users\SAIC2\Documents\GitHub\TestSALT\SALT\obj\Debug\SALT.pdb

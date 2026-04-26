@@ -1,0 +1,64 @@
+# Visual Studio workspace files
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+# .NET generated files
+*.dll
+*.exe
+*.pdb
+*.cache
+*.ilk
+*.iobj
+*.ipdb
+*.nupkg
+*.snupkg
+project.lock.json
+project.assets.json
+artifacts/
+TestResults/
+BenchmarkDotNet.Artifacts/
+
+# NuGet
+packages/
+*.nuget.props
+*.nuget.targets
+
+# MSTest / coverage
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS-generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local environment / secrets
+.env
+.env.*
+*.local
