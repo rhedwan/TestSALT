@@ -1,21 +1,81 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace TestSALT
 {
     public partial class Form1 : Form
     {
+        private Chart cpuFacilityChart;
+        private Label cpuFacilityChartSummaryLabel;
+
         public Form1()
         {
             InitializeComponent();
+            InitializeCpuFacilityGraph();
             AddCpuFacilityMenu();
+        }
+
+        private void InitializeCpuFacilityGraph()
+        {
+            tabPage1.Text = "Output";
+            tabPage2.Text = "Graph";
+            tabPage2.Controls.Clear();
+
+            TableLayoutPanel graphLayoutPanel = new TableLayoutPanel();
+            graphLayoutPanel.ColumnCount = 1;
+            graphLayoutPanel.Dock = DockStyle.Fill;
+            graphLayoutPanel.Padding = new Padding(8);
+            graphLayoutPanel.RowCount = 2;
+            graphLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 64F));
+            graphLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            cpuFacilityChartSummaryLabel = new Label();
+            cpuFacilityChartSummaryLabel.Dock = DockStyle.Fill;
+            cpuFacilityChartSummaryLabel.Font = new Font("Segoe UI", 9F);
+            cpuFacilityChartSummaryLabel.Padding = new Padding(6, 4, 6, 4);
+            cpuFacilityChartSummaryLabel.TextAlign = ContentAlignment.MiddleLeft;
+
+            cpuFacilityChart = new Chart();
+            cpuFacilityChart.AntiAliasing = AntiAliasingStyles.All;
+            cpuFacilityChart.BackColor = Color.White;
+            cpuFacilityChart.Dock = DockStyle.Fill;
+            cpuFacilityChart.Palette = ChartColorPalette.None;
+
+            ChartArea chartArea = new ChartArea("DelayByClass");
+            chartArea.AxisX.Interval = 1.0;
+            chartArea.AxisX.MajorGrid.Enabled = false;
+            chartArea.AxisX.Title = "Class";
+            chartArea.AxisY.LabelStyle.Format = "0.##";
+            chartArea.AxisY.MajorGrid.LineColor = Color.Gainsboro;
+            chartArea.AxisY.Minimum = 0.0;
+            chartArea.AxisY.Title = "Avg Delay in Queue (min)";
+            cpuFacilityChart.ChartAreas.Add(chartArea);
+
+            Legend legend = new Legend("Cases");
+            legend.Alignment = StringAlignment.Center;
+            legend.Docking = Docking.Top;
+            cpuFacilityChart.Legends.Add(legend);
+
+            cpuFacilityChart.Titles.Add(new Title(
+                "Average Queue Delay by Class",
+                Docking.Top,
+                new Font("Segoe UI", 11F, FontStyle.Bold),
+                Color.Black));
+
+            graphLayoutPanel.Controls.Add(cpuFacilityChartSummaryLabel, 0, 0);
+            graphLayoutPanel.Controls.Add(cpuFacilityChart, 0, 1);
+            tabPage2.Controls.Add(graphLayoutPanel);
+
+            ResetCpuFacilityChart();
         }
 
         private void AddCpuFacilityMenu()
@@ -71,6 +131,7 @@ namespace TestSALT
         private void CpuFacility_ClearOutputToolStripMenuItem_Click(object sender, EventArgs e)
         {
             outputTextBox.Clear();
+            ResetCpuFacilityChart();
         }
 
         private void WriteCpuFacilityReport(params SALTx.CPUS.CpuFacilityResult[] results)
@@ -78,6 +139,86 @@ namespace TestSALT
             outputTextBox.WordWrap = false;
             outputTextBox.Font = new Font("Consolas", outputTextBox.Font.Size);
             outputTextBox.Text = SALTx.CPUS.CpuFacilityRunner.FormatReport(results);
+            UpdateCpuFacilityChart(results);
+        }
+
+        private void UpdateCpuFacilityChart(params SALTx.CPUS.CpuFacilityResult[] results)
+        {
+            if (cpuFacilityChart == null)
+                return;
+
+            cpuFacilityChart.Series.Clear();
+
+            if (results == null || results.Length == 0)
+            {
+                ResetCpuFacilityChart();
+                return;
+            }
+
+            Color[] seriesColors = new Color[]
+            {
+                Color.FromArgb(54, 112, 214),
+                Color.FromArgb(229, 119, 46)
+            };
+
+            for (int i = 0; i < results.Length; i++)
+            {
+                SALTx.CPUS.CpuFacilityResult result = results[i];
+                Series series = new Series(result.ModeName);
+                series.ChartArea = "DelayByClass";
+                series.ChartType = SeriesChartType.Column;
+                series.Color = seriesColors[i % seriesColors.Length];
+                series.Font = new Font("Segoe UI", 8F);
+                series.IsValueShownAsLabel = true;
+                series.LabelFormat = "0.##";
+                series.Legend = "Cases";
+                series["PointWidth"] = "0.58";
+
+                for (int classLevel = 1; classLevel <= 4; classLevel++)
+                {
+                    SALTx.CPUS.CpuFacilityClassResult classResult = result.ClassResults
+                        .First(item => item.ClassLevel == classLevel);
+                    series.Points.AddXY(classLevel.ToString(CultureInfo.InvariantCulture), classResult.AverageDelayInQueue);
+                }
+
+                cpuFacilityChart.Series.Add(series);
+            }
+
+            cpuFacilityChartSummaryLabel.Text = BuildCpuFacilityChartSummary(results);
+            cpuFacilityChart.ChartAreas["DelayByClass"].RecalculateAxesScale();
+        }
+
+        private string BuildCpuFacilityChartSummary(params SALTx.CPUS.CpuFacilityResult[] results)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendFormat(
+                CultureInfo.InvariantCulture,
+                "Seed {0} | Lower delay is better.",
+                results[0].Seed);
+
+            foreach (SALTx.CPUS.CpuFacilityResult result in results)
+            {
+                builder.AppendLine();
+                builder.AppendFormat(
+                    CultureInfo.InvariantCulture,
+                    "{0}: {1}/{2} jobs completed, CPU utilization {3:0.0000}",
+                    result.ModeName,
+                    result.Completed,
+                    result.Admitted,
+                    result.CpuUtilization);
+            }
+
+            return builder.ToString();
+        }
+
+        private void ResetCpuFacilityChart()
+        {
+            if (cpuFacilityChart == null)
+                return;
+
+            cpuFacilityChart.Series.Clear();
+            cpuFacilityChartSummaryLabel.Text = "";
+            cpuFacilityChart.ChartAreas["DelayByClass"].AxisY.Minimum = 0.0;
         }
 
         #region SALT
