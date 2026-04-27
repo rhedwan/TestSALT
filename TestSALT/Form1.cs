@@ -16,6 +16,7 @@ namespace TestSALT
     {
         private Chart cpuFacilityChart;
         private Label cpuFacilityChartSummaryLabel;
+        private TabPage cpuFacilityGraphTabPage;
 
         public Form1()
         {
@@ -26,9 +27,11 @@ namespace TestSALT
 
         private void InitializeCpuFacilityGraph()
         {
-            tabPage1.Text = "Output";
-            tabPage2.Text = "Graph";
-            tabPage2.Controls.Clear();
+            cpuFacilityGraphTabPage = new TabPage();
+            cpuFacilityGraphTabPage.Name = "cpuFacilityGraphTabPage";
+            cpuFacilityGraphTabPage.Padding = new Padding(3);
+            cpuFacilityGraphTabPage.Text = "CPU Graph";
+            cpuFacilityGraphTabPage.UseVisualStyleBackColor = true;
 
             TableLayoutPanel graphLayoutPanel = new TableLayoutPanel();
             graphLayoutPanel.ColumnCount = 1;
@@ -73,7 +76,8 @@ namespace TestSALT
 
             graphLayoutPanel.Controls.Add(cpuFacilityChartSummaryLabel, 0, 0);
             graphLayoutPanel.Controls.Add(cpuFacilityChart, 0, 1);
-            tabPage2.Controls.Add(graphLayoutPanel);
+            cpuFacilityGraphTabPage.Controls.Add(graphLayoutPanel);
+            tabControl.Controls.Add(cpuFacilityGraphTabPage);
 
             ResetCpuFacilityChart();
         }
@@ -140,6 +144,7 @@ namespace TestSALT
             outputTextBox.Font = new Font("Consolas", outputTextBox.Font.Size);
             outputTextBox.Text = SALTx.CPUS.CpuFacilityRunner.FormatReport(results);
             UpdateCpuFacilityChart(results);
+            tabControl.SelectedTab = cpuFacilityGraphTabPage;
         }
 
         private void UpdateCpuFacilityChart(params SALTx.CPUS.CpuFacilityResult[] results)
