@@ -187,10 +187,64 @@ namespace SALTx.CPUS
                     metrics.Class1Delay));
             }
 
+            AppendBaselinePolicyComparisonTable(builder, results);
             AppendDiscussion(builder, results);
             AppendOptimization(builder, results);
 
             return builder.ToString();
+        }
+
+        private static void AppendBaselinePolicyComparisonTable(
+            StringBuilder builder,
+            IList<CpuFacilityResult> results)
+        {
+            CpuFacilityResult nonPreemptive = FindResult(
+                results,
+                "Baseline",
+                SimulationMode.NonPreemptive);
+            CpuFacilityResult preemptive = FindResult(
+                results,
+                "Baseline",
+                SimulationMode.PreemptiveResume);
+
+            builder.AppendLine();
+            builder.AppendLine("Preemptive and Non-Preemptive Detailed Table");
+            builder.AppendLine("This table compares the two CPU scheduling rules for the baseline input parameters, broken down by priority class.");
+            builder.AppendLine();
+            builder.AppendLine(string.Format(
+                CultureInfo.InvariantCulture,
+                "{0,-20} {1,5} {2,10} {3,20} {4,25} {5,16} {6,16}",
+                "Case",
+                "Class",
+                "Completed",
+                "Avg Number in Queue",
+                "Avg Delay in Queue (min)",
+                "CPU Busy Share",
+                "CPU Utilization"));
+            builder.AppendLine(new string('-', 124));
+
+            AppendPolicyRows(builder, nonPreemptive);
+            AppendPolicyRows(builder, preemptive);
+        }
+
+        private static void AppendPolicyRows(StringBuilder builder, CpuFacilityResult result)
+        {
+            if (result == null)
+                return;
+
+            foreach (CpuFacilityClassResult classResult in result.ClassResults)
+            {
+                builder.AppendLine(string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0,-20} {1,5} {2,10} {3,20:0.0000} {4,25:0.0000} {5,16:0.0000} {6,16:0.0000}",
+                    result.ModeName,
+                    classResult.ClassLevel,
+                    classResult.Completed,
+                    classResult.AverageNumberInQueue,
+                    classResult.AverageDelayInQueue,
+                    classResult.CpuBusyShare,
+                    result.CpuUtilization));
+            }
         }
 
         private static void AppendDiscussion(StringBuilder builder, IList<CpuFacilityResult> results)

@@ -16,7 +16,6 @@ namespace TestSALT
     public partial class Form1 : Form
     {
         private Chart cpuFacilityChart;
-        private TabPage cpuFacilityGraphTabPage;
 
         public Form1()
         {
@@ -27,11 +26,17 @@ namespace TestSALT
 
         private void InitializeCpuFacilityGraph()
         {
-            cpuFacilityGraphTabPage = new TabPage();
-            cpuFacilityGraphTabPage.Name = "cpuFacilityGraphTabPage";
-            cpuFacilityGraphTabPage.Padding = new Padding(3);
-            cpuFacilityGraphTabPage.Text = "CPU Graph";
-            cpuFacilityGraphTabPage.UseVisualStyleBackColor = true;
+            tabPage1.Controls.Clear();
+
+            TableLayoutPanel cpuFacilityOutputLayoutPanel = new TableLayoutPanel();
+            cpuFacilityOutputLayoutPanel.ColumnCount = 1;
+            cpuFacilityOutputLayoutPanel.Dock = DockStyle.Fill;
+            cpuFacilityOutputLayoutPanel.RowCount = 2;
+            cpuFacilityOutputLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 55F));
+            cpuFacilityOutputLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 45F));
+
+            outputTextBox.Dock = DockStyle.Fill;
+            cpuFacilityOutputLayoutPanel.Controls.Add(outputTextBox, 0, 0);
 
             cpuFacilityChart = new Chart();
             cpuFacilityChart.AntiAliasing = AntiAliasingStyles.All;
@@ -61,8 +66,8 @@ namespace TestSALT
                 new Font("Segoe UI", 11F, FontStyle.Bold),
                 Color.Black));
 
-            cpuFacilityGraphTabPage.Controls.Add(cpuFacilityChart);
-            tabControl.Controls.Add(cpuFacilityGraphTabPage);
+            cpuFacilityOutputLayoutPanel.Controls.Add(cpuFacilityChart, 0, 1);
+            tabPage1.Controls.Add(cpuFacilityOutputLayoutPanel);
 
             ResetCpuFacilityChart();
         }
@@ -141,7 +146,7 @@ namespace TestSALT
             outputTextBox.Text = reportText;
             SaveCpuFacilityReport(reportText, results);
             UpdateCpuFacilityChart(results);
-            tabControl.SelectedTab = cpuFacilityGraphTabPage;
+            tabControl.SelectedTab = tabPage1;
         }
 
         private void SaveCpuFacilityReport(string reportText, params SALTx.CPUS.CpuFacilityResult[] results)
