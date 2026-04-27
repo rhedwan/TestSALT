@@ -42,9 +42,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="CPUS\CpuFacilityResult.cs" />
+    <Compile Include="CPUS\CpuFacilityRunner.cs" />
+    <Compile Include="CPUS\Job.cs" />
     <Compile Include="CPUS\Queue.cs" />
     <Compile Include="CPUS\Scheduler.cs" />
     <Compile Include="CPUS\Server.cs" />
+    <Compile Include="CPUS\SimulationMode.cs" />
     <Compile Include="ISYS\Ct.cs" />
     <Compile Include="ISYS\Dt.cs" />
     <Compile Include="ISYS\Edge.cs" />

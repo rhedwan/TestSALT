@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using SALTx.CPUS;
 using SALTx.ISYS;
 
 namespace TestSALT
@@ -187,7 +188,7 @@ namespace TestSALT
 
         partial void Test_SALTx_CPUS_ServerToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            WriteCpuFacilityReport(CpuFacilityRunner.RunBoth(CpuFacilityRunner.DefaultSeed));
         }
     }
 }
