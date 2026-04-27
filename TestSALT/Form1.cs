@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -72,17 +73,20 @@ namespace TestSALT
             ToolStripMenuItem runNonPreemptiveToolStripMenuItem = new ToolStripMenuItem("Run Non-Preemptive");
             ToolStripMenuItem runPreemptiveToolStripMenuItem = new ToolStripMenuItem("Run Preemptive-Resume");
             ToolStripMenuItem runBothToolStripMenuItem = new ToolStripMenuItem("Run Both Cases");
+            ToolStripMenuItem runSectionFiveStudyToolStripMenuItem = new ToolStripMenuItem("Run Section 5 Study");
             ToolStripMenuItem clearOutputToolStripMenuItem = new ToolStripMenuItem("Clear Output");
 
             cpuFacilityToolStripMenuItem.Name = "cpuFacilityToolStripMenuItem";
             runNonPreemptiveToolStripMenuItem.Name = "cpuFacilityRunNonPreemptiveToolStripMenuItem";
             runPreemptiveToolStripMenuItem.Name = "cpuFacilityRunPreemptiveToolStripMenuItem";
             runBothToolStripMenuItem.Name = "cpuFacilityRunBothToolStripMenuItem";
+            runSectionFiveStudyToolStripMenuItem.Name = "cpuFacilityRunSectionFiveStudyToolStripMenuItem";
             clearOutputToolStripMenuItem.Name = "cpuFacilityClearOutputToolStripMenuItem";
 
             runNonPreemptiveToolStripMenuItem.Click += CpuFacility_RunNonPreemptiveToolStripMenuItem_Click;
             runPreemptiveToolStripMenuItem.Click += CpuFacility_RunPreemptiveToolStripMenuItem_Click;
             runBothToolStripMenuItem.Click += CpuFacility_RunBothToolStripMenuItem_Click;
+            runSectionFiveStudyToolStripMenuItem.Click += CpuFacility_RunSectionFiveStudyToolStripMenuItem_Click;
             clearOutputToolStripMenuItem.Click += CpuFacility_ClearOutputToolStripMenuItem_Click;
 
             cpuFacilityToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[]
@@ -90,6 +94,7 @@ namespace TestSALT
                 runNonPreemptiveToolStripMenuItem,
                 runPreemptiveToolStripMenuItem,
                 runBothToolStripMenuItem,
+                runSectionFiveStudyToolStripMenuItem,
                 new ToolStripSeparator(),
                 clearOutputToolStripMenuItem
             });
@@ -116,6 +121,11 @@ namespace TestSALT
             WriteCpuFacilityReport(SALTx.CPUS.CpuFacilityRunner.RunBoth(SALTx.CPUS.CpuFacilityRunner.DefaultSeed));
         }
 
+        private void CpuFacility_RunSectionFiveStudyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            WriteCpuFacilityStudyReport();
+        }
+
         private void CpuFacility_ClearOutputToolStripMenuItem_Click(object sender, EventArgs e)
         {
             outputTextBox.Clear();
@@ -124,11 +134,82 @@ namespace TestSALT
 
         private void WriteCpuFacilityReport(params SALTx.CPUS.CpuFacilityResult[] results)
         {
+            string reportText = SALTx.CPUS.CpuFacilityRunner.FormatReport(results);
+
             outputTextBox.WordWrap = false;
             outputTextBox.Font = new Font("Consolas", outputTextBox.Font.Size);
-            outputTextBox.Text = SALTx.CPUS.CpuFacilityRunner.FormatReport(results);
+            outputTextBox.Text = reportText;
+            SaveCpuFacilityReport(reportText, results);
             UpdateCpuFacilityChart(results);
             tabControl.SelectedTab = cpuFacilityGraphTabPage;
+        }
+
+        private void SaveCpuFacilityReport(string reportText, params SALTx.CPUS.CpuFacilityResult[] results)
+        {
+            if (results == null || results.Length == 0)
+                return;
+
+            string reportsFolder = Path.Combine(Application.StartupPath, "CPUFacilityReports");
+            Directory.CreateDirectory(reportsFolder);
+
+            string caseName = results.Length == 1
+                ? ToFileNamePart(results[0].ModeName)
+                : "BothCases";
+            string seed = results[0].Seed.ToString(CultureInfo.InvariantCulture);
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
+            string fileName = string.Format(
+                CultureInfo.InvariantCulture,
+                "CPUFacility_{0}_Seed{1}_{2}.txt",
+                caseName,
+                seed,
+                timestamp);
+
+            File.WriteAllText(Path.Combine(reportsFolder, fileName), reportText, Encoding.UTF8);
+        }
+
+        private void WriteCpuFacilityStudyReport()
+        {
+            string reportText = SALTx.CPUS.CpuFacilityRunner.FormatSectionFiveReport(
+                SALTx.CPUS.CpuFacilityRunner.DefaultSeed);
+
+            outputTextBox.WordWrap = false;
+            outputTextBox.Font = new Font("Consolas", outputTextBox.Font.Size);
+            outputTextBox.Text = reportText;
+            SaveCpuFacilityTextReport(
+                "Section5Study",
+                SALTx.CPUS.CpuFacilityRunner.DefaultSeed,
+                reportText);
+            ResetCpuFacilityChart();
+            tabControl.SelectedTab = tabPage1;
+        }
+
+        private void SaveCpuFacilityTextReport(string reportName, int seed, string reportText)
+        {
+            string reportsFolder = Path.Combine(Application.StartupPath, "CPUFacilityReports");
+            Directory.CreateDirectory(reportsFolder);
+
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture);
+            string fileName = string.Format(
+                CultureInfo.InvariantCulture,
+                "CPUFacility_{0}_Seed{1}_{2}.txt",
+                ToFileNamePart(reportName),
+                seed,
+                timestamp);
+
+            File.WriteAllText(Path.Combine(reportsFolder, fileName), reportText, Encoding.UTF8);
+        }
+
+        private string ToFileNamePart(string value)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (char character in value)
+            {
+                if (char.IsLetterOrDigit(character))
+                    builder.Append(character);
+            }
+
+            return builder.ToString();
         }
 
         private void UpdateCpuFacilityChart(params SALTx.CPUS.CpuFacilityResult[] results)

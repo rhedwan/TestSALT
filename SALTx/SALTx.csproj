@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="CPUS\CpuFacilityConfiguration.cs" />
     <Compile Include="CPUS\CpuFacilityResult.cs" />
     <Compile Include="CPUS\CpuFacilityRunner.cs" />
     <Compile Include="CPUS\Job.cs" />

@@ -34,6 +34,7 @@ namespace SALTx.CPUS
     {
         internal CpuFacilityResult(
             SimulationMode mode,
+            CpuFacilityConfiguration configuration,
             int seed,
             double endTime,
             int admitted,
@@ -42,6 +43,7 @@ namespace SALTx.CPUS
             IList<CpuFacilityClassResult> classResults)
         {
             Mode = mode;
+            Configuration = configuration;
             Seed = seed;
             EndTime = endTime;
             Admitted = admitted;
@@ -55,6 +57,8 @@ namespace SALTx.CPUS
         public ReadOnlyCollection<CpuFacilityClassResult> ClassResults { get; }
 
         public int Completed { get; }
+
+        public CpuFacilityConfiguration Configuration { get; }
 
         public double CpuUtilization { get; }
 
