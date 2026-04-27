@@ -146,13 +146,20 @@ namespace SALTx.CPUS
             return FormatSectionFiveReport(seed, false);
         }
 
-        private static string FormatSectionFiveReport(int seed, bool includeDiscussionAndOptimization)
+        public static CpuFacilityResult[] RunDifferentInputCases(int seed)
         {
             List<CpuFacilityResult> results = new List<CpuFacilityResult>();
             CpuFacilityConfiguration[] configurations = CreateSectionFiveConfigurations();
 
             foreach (CpuFacilityConfiguration configuration in configurations)
                 results.AddRange(RunBoth(seed, configuration));
+
+            return results.ToArray();
+        }
+
+        private static string FormatSectionFiveReport(int seed, bool includeDiscussionAndOptimization)
+        {
+            CpuFacilityResult[] results = RunDifferentInputCases(seed);
 
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(includeDiscussionAndOptimization

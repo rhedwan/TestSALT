@@ -78,7 +78,7 @@ namespace TestSALT
             ToolStripMenuItem runNonPreemptiveToolStripMenuItem = new ToolStripMenuItem("Run Non-Preemptive");
             ToolStripMenuItem runPreemptiveToolStripMenuItem = new ToolStripMenuItem("Run Preemptive-Resume");
             ToolStripMenuItem runBothToolStripMenuItem = new ToolStripMenuItem("Run Both Cases");
-            ToolStripMenuItem runSectionFiveStudyToolStripMenuItem = new ToolStripMenuItem("Run Simulation Tables");
+            ToolStripMenuItem runSectionFiveStudyToolStripMenuItem = new ToolStripMenuItem("Run Simulation for Different Input Case");
             ToolStripMenuItem clearOutputToolStripMenuItem = new ToolStripMenuItem("Clear Output");
 
             cpuFacilityToolStripMenuItem.Name = "cpuFacilityToolStripMenuItem";
@@ -174,6 +174,8 @@ namespace TestSALT
 
         private void WriteCpuFacilityStudyReport()
         {
+            SALTx.CPUS.CpuFacilityResult[] results = SALTx.CPUS.CpuFacilityRunner.RunDifferentInputCases(
+                SALTx.CPUS.CpuFacilityRunner.DefaultSeed);
             string reportText = SALTx.CPUS.CpuFacilityRunner.FormatSectionFiveTableReport(
                 SALTx.CPUS.CpuFacilityRunner.DefaultSeed);
 
@@ -181,10 +183,10 @@ namespace TestSALT
             outputTextBox.Font = new Font("Consolas", outputTextBox.Font.Size);
             outputTextBox.Text = reportText;
             SaveCpuFacilityTextReport(
-                "SimulationTables",
+                "DifferentInputCase",
                 SALTx.CPUS.CpuFacilityRunner.DefaultSeed,
                 reportText);
-            ResetCpuFacilityChart();
+            UpdateCpuFacilityDifferentInputChart(results);
             tabControl.SelectedTab = tabPage1;
         }
 
@@ -223,6 +225,10 @@ namespace TestSALT
                 return;
 
             cpuFacilityChart.Series.Clear();
+            cpuFacilityChart.Titles[0].Text = "Average Queue Delay by Class";
+            cpuFacilityChart.ChartAreas["DelayByClass"].AxisX.Title = "Class";
+            cpuFacilityChart.ChartAreas["DelayByClass"].AxisX.LabelStyle.Angle = 0;
+            cpuFacilityChart.ChartAreas["DelayByClass"].AxisY.Title = "Avg Delay in Queue (min)";
 
             if (results == null || results.Length == 0)
             {
@@ -260,6 +266,79 @@ namespace TestSALT
             }
 
             cpuFacilityChart.ChartAreas["DelayByClass"].RecalculateAxesScale();
+        }
+
+        private void UpdateCpuFacilityDifferentInputChart(params SALTx.CPUS.CpuFacilityResult[] results)
+        {
+            if (cpuFacilityChart == null)
+                return;
+
+            cpuFacilityChart.Series.Clear();
+            cpuFacilityChart.Titles[0].Text = "Average Queue Delay by Input Case";
+            cpuFacilityChart.ChartAreas["DelayByClass"].AxisX.Title = "Input Case";
+            cpuFacilityChart.ChartAreas["DelayByClass"].AxisX.LabelStyle.Angle = -30;
+            cpuFacilityChart.ChartAreas["DelayByClass"].AxisY.Title = "Avg Queue Delay (min)";
+
+            if (results == null || results.Length == 0)
+            {
+                ResetCpuFacilityChart();
+                return;
+            }
+
+            Color[] seriesColors = new Color[]
+            {
+                Color.FromArgb(54, 112, 214),
+                Color.FromArgb(229, 119, 46)
+            };
+            SALTx.CPUS.SimulationMode[] modes = new SALTx.CPUS.SimulationMode[]
+            {
+                SALTx.CPUS.SimulationMode.NonPreemptive,
+                SALTx.CPUS.SimulationMode.PreemptiveResume
+            };
+            string[] configurationNames = results
+                .Select(result => result.Configuration.Name)
+                .Distinct()
+                .ToArray();
+
+            for (int i = 0; i < modes.Length; i++)
+            {
+                SALTx.CPUS.SimulationMode mode = modes[i];
+                Series series = new Series(mode == SALTx.CPUS.SimulationMode.NonPreemptive
+                    ? "Non-Preemptive"
+                    : "Preemptive-Resume");
+                series.ChartArea = "DelayByClass";
+                series.ChartType = SeriesChartType.Column;
+                series.Color = seriesColors[i % seriesColors.Length];
+                series.Font = new Font("Segoe UI", 8F);
+                series.IsValueShownAsLabel = true;
+                series.LabelFormat = "0.##";
+                series.Legend = "Cases";
+                series["PointWidth"] = "0.58";
+
+                foreach (string configurationName in configurationNames)
+                {
+                    SALTx.CPUS.CpuFacilityResult result = results.First(item =>
+                        item.Configuration.Name == configurationName && item.Mode == mode);
+                    series.Points.AddXY(configurationName, GetAverageDelay(result));
+                }
+
+                cpuFacilityChart.Series.Add(series);
+            }
+
+            cpuFacilityChart.ChartAreas["DelayByClass"].RecalculateAxesScale();
+        }
+
+        private double GetAverageDelay(SALTx.CPUS.CpuFacilityResult result)
+        {
+            double weightedDelay = 0.0;
+
+            foreach (SALTx.CPUS.CpuFacilityClassResult classResult in result.ClassResults)
+                weightedDelay += classResult.AverageDelayInQueue * classResult.Completed;
+
+            if (result.Completed == 0)
+                return 0.0;
+
+            return weightedDelay / result.Completed;
         }
 
         private void ResetCpuFacilityChart()
