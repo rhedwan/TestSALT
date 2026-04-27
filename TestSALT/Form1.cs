@@ -15,7 +15,6 @@ namespace TestSALT
     public partial class Form1 : Form
     {
         private Chart cpuFacilityChart;
-        private Label cpuFacilityChartSummaryLabel;
         private TabPage cpuFacilityGraphTabPage;
 
         public Form1()
@@ -33,24 +32,11 @@ namespace TestSALT
             cpuFacilityGraphTabPage.Text = "CPU Graph";
             cpuFacilityGraphTabPage.UseVisualStyleBackColor = true;
 
-            TableLayoutPanel graphLayoutPanel = new TableLayoutPanel();
-            graphLayoutPanel.ColumnCount = 1;
-            graphLayoutPanel.Dock = DockStyle.Fill;
-            graphLayoutPanel.Padding = new Padding(8);
-            graphLayoutPanel.RowCount = 2;
-            graphLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 64F));
-            graphLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-
-            cpuFacilityChartSummaryLabel = new Label();
-            cpuFacilityChartSummaryLabel.Dock = DockStyle.Fill;
-            cpuFacilityChartSummaryLabel.Font = new Font("Segoe UI", 9F);
-            cpuFacilityChartSummaryLabel.Padding = new Padding(6, 4, 6, 4);
-            cpuFacilityChartSummaryLabel.TextAlign = ContentAlignment.MiddleLeft;
-
             cpuFacilityChart = new Chart();
             cpuFacilityChart.AntiAliasing = AntiAliasingStyles.All;
             cpuFacilityChart.BackColor = Color.White;
             cpuFacilityChart.Dock = DockStyle.Fill;
+            cpuFacilityChart.Padding = new Padding(8);
             cpuFacilityChart.Palette = ChartColorPalette.None;
 
             ChartArea chartArea = new ChartArea("DelayByClass");
@@ -74,9 +60,7 @@ namespace TestSALT
                 new Font("Segoe UI", 11F, FontStyle.Bold),
                 Color.Black));
 
-            graphLayoutPanel.Controls.Add(cpuFacilityChartSummaryLabel, 0, 0);
-            graphLayoutPanel.Controls.Add(cpuFacilityChart, 0, 1);
-            cpuFacilityGraphTabPage.Controls.Add(graphLayoutPanel);
+            cpuFacilityGraphTabPage.Controls.Add(cpuFacilityChart);
             tabControl.Controls.Add(cpuFacilityGraphTabPage);
 
             ResetCpuFacilityChart();
@@ -189,31 +173,7 @@ namespace TestSALT
                 cpuFacilityChart.Series.Add(series);
             }
 
-            cpuFacilityChartSummaryLabel.Text = BuildCpuFacilityChartSummary(results);
             cpuFacilityChart.ChartAreas["DelayByClass"].RecalculateAxesScale();
-        }
-
-        private string BuildCpuFacilityChartSummary(params SALTx.CPUS.CpuFacilityResult[] results)
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.AppendFormat(
-                CultureInfo.InvariantCulture,
-                "Seed {0} | Lower delay is better.",
-                results[0].Seed);
-
-            foreach (SALTx.CPUS.CpuFacilityResult result in results)
-            {
-                builder.AppendLine();
-                builder.AppendFormat(
-                    CultureInfo.InvariantCulture,
-                    "{0}: {1}/{2} jobs completed, CPU utilization {3:0.0000}",
-                    result.ModeName,
-                    result.Completed,
-                    result.Admitted,
-                    result.CpuUtilization);
-            }
-
-            return builder.ToString();
         }
 
         private void ResetCpuFacilityChart()
@@ -222,7 +182,6 @@ namespace TestSALT
                 return;
 
             cpuFacilityChart.Series.Clear();
-            cpuFacilityChartSummaryLabel.Text = "";
             cpuFacilityChart.ChartAreas["DelayByClass"].AxisY.Minimum = 0.0;
         }
 
