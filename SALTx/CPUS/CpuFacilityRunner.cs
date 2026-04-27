@@ -138,6 +138,16 @@ namespace SALTx.CPUS
 
         public static string FormatSectionFiveReport(int seed)
         {
+            return FormatSectionFiveReport(seed, true);
+        }
+
+        public static string FormatSectionFiveTableReport(int seed)
+        {
+            return FormatSectionFiveReport(seed, false);
+        }
+
+        private static string FormatSectionFiveReport(int seed, bool includeDiscussionAndOptimization)
+        {
             List<CpuFacilityResult> results = new List<CpuFacilityResult>();
             CpuFacilityConfiguration[] configurations = CreateSectionFiveConfigurations();
 
@@ -145,9 +155,13 @@ namespace SALTx.CPUS
                 results.AddRange(RunBoth(seed, configuration));
 
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("5) Simulation Output and Discussion");
+            builder.AppendLine(includeDiscussionAndOptimization
+                ? "5) Simulation Output and Discussion"
+                : "Simulation Output Tables");
             builder.AppendLine();
-            builder.AppendLine("i) Simulation Output Table");
+            builder.AppendLine(includeDiscussionAndOptimization
+                ? "i) Simulation Output Table"
+                : "Simulation Output Table");
             builder.AppendLine("Each row is one simulation run. Input parameters are summarized by arrival rate, class mix, and service means.");
             builder.AppendLine();
             builder.AppendLine(string.Format(
@@ -188,8 +202,12 @@ namespace SALTx.CPUS
             }
 
             AppendBaselinePolicyComparisonTable(builder, results);
-            AppendDiscussion(builder, results);
-            AppendOptimization(builder, results);
+
+            if (includeDiscussionAndOptimization)
+            {
+                AppendDiscussion(builder, results);
+                AppendOptimization(builder, results);
+            }
 
             return builder.ToString();
         }

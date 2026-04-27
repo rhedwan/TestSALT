@@ -78,7 +78,7 @@ namespace TestSALT
             ToolStripMenuItem runNonPreemptiveToolStripMenuItem = new ToolStripMenuItem("Run Non-Preemptive");
             ToolStripMenuItem runPreemptiveToolStripMenuItem = new ToolStripMenuItem("Run Preemptive-Resume");
             ToolStripMenuItem runBothToolStripMenuItem = new ToolStripMenuItem("Run Both Cases");
-            ToolStripMenuItem runSectionFiveStudyToolStripMenuItem = new ToolStripMenuItem("Run Section 5 Study");
+            ToolStripMenuItem runSectionFiveStudyToolStripMenuItem = new ToolStripMenuItem("Run Simulation Tables");
             ToolStripMenuItem clearOutputToolStripMenuItem = new ToolStripMenuItem("Clear Output");
 
             cpuFacilityToolStripMenuItem.Name = "cpuFacilityToolStripMenuItem";
@@ -174,14 +174,14 @@ namespace TestSALT
 
         private void WriteCpuFacilityStudyReport()
         {
-            string reportText = SALTx.CPUS.CpuFacilityRunner.FormatSectionFiveReport(
+            string reportText = SALTx.CPUS.CpuFacilityRunner.FormatSectionFiveTableReport(
                 SALTx.CPUS.CpuFacilityRunner.DefaultSeed);
 
             outputTextBox.WordWrap = false;
             outputTextBox.Font = new Font("Consolas", outputTextBox.Font.Size);
             outputTextBox.Text = reportText;
             SaveCpuFacilityTextReport(
-                "Section5Study",
+                "SimulationTables",
                 SALTx.CPUS.CpuFacilityRunner.DefaultSeed,
                 reportText);
             ResetCpuFacilityChart();
