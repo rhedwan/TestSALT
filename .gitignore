@@ -58,6 +58,14 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
+# Local course materials
+Resources/
+
+# Local tooling / cache
+.claude/
+.cache/
+cache/
+
 # Local environment / secrets
 .env
 .env.*
