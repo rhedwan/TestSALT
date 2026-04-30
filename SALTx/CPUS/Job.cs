@@ -1,5 +1,6 @@
 namespace SALTx.CPUS
 {
+    // Represents one admitted batch job and the timing data needed for service and queue statistics.
     internal sealed class Job
     {
         internal Job(int id, int classLevel, double arrivalTime, double serviceTime)

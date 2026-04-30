@@ -5,17 +5,20 @@ using System.Text;
 
 namespace SALTx.CPUS
 {
+    // Runs the CPU facility simulation, collects output statistics, and formats report tables.
     public static class CpuFacilityRunner
     {
         public const int DefaultSeed = 4182026;
 
         private static readonly CpuFacilityConfiguration DefaultConfiguration = CpuFacilityConfiguration.Baseline();
 
+        // Runs one simulation case using the baseline input configuration.
         public static CpuFacilityResult Run(SimulationMode mode, int seed)
         {
             return Run(mode, seed, DefaultConfiguration);
         }
 
+        // Runs one complete simulation case using the selected mode, seed, and configuration.
         public static CpuFacilityResult Run(SimulationMode mode, int seed, CpuFacilityConfiguration configuration)
         {
             RngStreams streams = new RngStreams(seed, configuration);
@@ -68,11 +71,13 @@ namespace SALTx.CPUS
             return BuildResult(mode, configuration, seed, time, queues, server, admittedByClass, completedByClass, queueDelayByClass);
         }
 
+        // Runs both scheduling policies using the baseline input configuration.
         public static CpuFacilityResult[] RunBoth(int seed)
         {
             return RunBoth(seed, DefaultConfiguration);
         }
 
+        // Runs both non-preemptive and preemptive-resume cases using the same seed and configuration.
         public static CpuFacilityResult[] RunBoth(int seed, CpuFacilityConfiguration configuration)
         {
             return new CpuFacilityResult[]
@@ -82,6 +87,7 @@ namespace SALTx.CPUS
             };
         }
 
+        // Formats one or more simulation results into a compact output table.
         public static string FormatReport(params CpuFacilityResult[] results)
         {
             StringBuilder builder = new StringBuilder();
@@ -136,16 +142,19 @@ namespace SALTx.CPUS
             return builder.ToString();
         }
 
+        // Formats the full Section 5 report, including tables, discussion, and optimization text.
         public static string FormatSectionFiveReport(int seed)
         {
             return FormatSectionFiveReport(seed, true);
         }
 
+        // Formats only the Section 5 simulation output tables.
         public static string FormatSectionFiveTableReport(int seed)
         {
             return FormatSectionFiveReport(seed, false);
         }
 
+        // Runs all alternative input configurations used in the Section 5 study.
         public static CpuFacilityResult[] RunDifferentInputCases(int seed)
         {
             List<CpuFacilityResult> results = new List<CpuFacilityResult>();
@@ -157,6 +166,7 @@ namespace SALTx.CPUS
             return results.ToArray();
         }
 
+        // Builds the Section 5 report text from the different input-parameter simulation results.
         private static string FormatSectionFiveReport(int seed, bool includeDiscussionAndOptimization)
         {
             CpuFacilityResult[] results = RunDifferentInputCases(seed);
@@ -219,6 +229,7 @@ namespace SALTx.CPUS
             return builder.ToString();
         }
 
+        // Adds the detailed baseline comparison table for both CPU scheduling policies.
         private static void AppendBaselinePolicyComparisonTable(
             StringBuilder builder,
             IList<CpuFacilityResult> results)
@@ -252,6 +263,7 @@ namespace SALTx.CPUS
             AppendPolicyRows(builder, preemptive);
         }
 
+        // Adds one table row per priority class for a scheduling-policy result.
         private static void AppendPolicyRows(StringBuilder builder, CpuFacilityResult result)
         {
             if (result == null)
@@ -272,6 +284,7 @@ namespace SALTx.CPUS
             }
         }
 
+        // Adds discussion text explaining the main trends across simulation runs.
         private static void AppendDiscussion(StringBuilder builder, IList<CpuFacilityResult> results)
         {
             CpuFacilityResult worstDelay = FindWorstDelay(results);
@@ -295,6 +308,7 @@ namespace SALTx.CPUS
             builder.AppendLine("CPU utilization is mostly driven by total workload, not by the scheduling rule. For the same input configuration, non-preemptive and preemptive-resume process the same admitted jobs after the system drains, but they distribute waiting time differently across priority classes.");
         }
 
+        // Adds optimization recommendations based on the simulation results.
         private static void AppendOptimization(StringBuilder builder, IList<CpuFacilityResult> results)
         {
             CpuFacilityResult bestClass4 = FindBestClass4Delay(results);
@@ -311,6 +325,7 @@ namespace SALTx.CPUS
             builder.AppendLine("If fairness for class 1 jobs is also important, use preemptive-resume with monitoring or limits, because priority protection can shift delay from class 4 to lower-priority classes.");
         }
 
+        // Aggregates per-class results into summary values used in the Section 5 table.
         private static AggregateMetrics Aggregate(CpuFacilityResult result)
         {
             double weightedDelay = 0.0;
@@ -336,6 +351,7 @@ namespace SALTx.CPUS
                 class1Delay);
         }
 
+        // Counts how often preemptive-resume improves class 4 delay over non-preemptive service.
         private static int CountClass4PreemptiveImprovements(IList<CpuFacilityResult> results)
         {
             int count = 0;
@@ -358,6 +374,7 @@ namespace SALTx.CPUS
             return count;
         }
 
+        // Defines the baseline and alternative input-parameter configurations for Section 5.
         private static CpuFacilityConfiguration[] CreateSectionFiveConfigurations()
         {
             return new CpuFacilityConfiguration[]
@@ -370,6 +387,7 @@ namespace SALTx.CPUS
             };
         }
 
+        // Finds the result with the smallest class 4 queue delay.
         private static CpuFacilityResult FindBestClass4Delay(IList<CpuFacilityResult> results)
         {
             CpuFacilityResult best = results[0];
@@ -383,6 +401,7 @@ namespace SALTx.CPUS
             return best;
         }
 
+        // Finds the result with the smallest overall average queue delay.
         private static CpuFacilityResult FindBestDelay(IList<CpuFacilityResult> results)
         {
             CpuFacilityResult best = results[0];
@@ -396,6 +415,7 @@ namespace SALTx.CPUS
             return best;
         }
 
+        // Finds the result with the largest overall average queue delay.
         private static CpuFacilityResult FindWorstDelay(IList<CpuFacilityResult> results)
         {
             CpuFacilityResult worst = results[0];
@@ -409,6 +429,7 @@ namespace SALTx.CPUS
             return worst;
         }
 
+        // Finds a result by configuration name and simulation mode.
         private static CpuFacilityResult FindResult(
             IList<CpuFacilityResult> results,
             string configurationName,
@@ -423,6 +444,7 @@ namespace SALTx.CPUS
             return null;
         }
 
+        // Formats class probabilities in priority order: class 4, class 3, class 2, class 1.
         private static string FormatClassProbabilities(CpuFacilityConfiguration configuration)
         {
             return string.Format(
@@ -434,6 +456,7 @@ namespace SALTx.CPUS
                 configuration.Class1Probability);
         }
 
+        // Formats service means in priority order: class 4, class 3, class 2, class 1.
         private static string FormatServiceMeans(CpuFacilityConfiguration configuration)
         {
             return string.Format(
@@ -445,6 +468,7 @@ namespace SALTx.CPUS
                 configuration.GetServiceMean(1));
         }
 
+        // Admits a new job by starting service, preempting the current job, or queueing the job.
         private static void Admit(Job job, SimulationMode mode, double time, Server server, Queue[] queues, Scheduler scheduler)
         {
             if (!server.IsBusy)
@@ -464,6 +488,7 @@ namespace SALTx.CPUS
             queues[job.ClassLevel].EnqueueTail(job, time);
         }
 
+        // Builds the final result object after all admitted jobs have completed service.
         private static CpuFacilityResult BuildResult(
             SimulationMode mode,
             CpuFacilityConfiguration configuration,
@@ -515,6 +540,7 @@ namespace SALTx.CPUS
                 classResults);
         }
 
+        // Creates one FIFO queue for each job class.
         private static Queue[] CreateQueues()
         {
             Queue[] queues = new Queue[5];
@@ -523,6 +549,7 @@ namespace SALTx.CPUS
             return queues;
         }
 
+        // Creates a new job by sampling its class and 3-Erlang service time.
         private static Job CreateJob(int id, double time, RngStreams streams)
         {
             int classLevel = streams.NextClassLevel();
@@ -530,6 +557,7 @@ namespace SALTx.CPUS
             return new Job(id, classLevel, time, serviceTime);
         }
 
+        // Sends the highest-priority waiting job to the CPU when the server becomes free.
         private static void DispatchNext(double time, Server server, Queue[] queues, Scheduler scheduler)
         {
             for (int classLevel = 4; classLevel >= 1; classLevel--)
@@ -542,6 +570,7 @@ namespace SALTx.CPUS
             }
         }
 
+        // Schedules the next arrival if it occurs before the admission window closes.
         private static void ScheduleNextArrival(
             double time,
             RngStreams streams,
@@ -553,6 +582,7 @@ namespace SALTx.CPUS
                 scheduler.Schedule(nextArrivalTime, FacilityEventType.Arrival);
         }
 
+        // Stores aggregate summary statistics used in Section 5 comparison tables.
         private sealed class AggregateMetrics
         {
             internal AggregateMetrics(
@@ -576,6 +606,7 @@ namespace SALTx.CPUS
             internal double Class4Delay { get; }
         }
 
+        // Holds independent seeded random streams for arrivals, classes, and service times.
         private sealed class RngStreams
         {
             private readonly Random classStream;
@@ -593,6 +624,7 @@ namespace SALTx.CPUS
                     serviceStreams[classLevel] = new Random(MixSeed(seed, 10 + classLevel));
             }
 
+            // Samples the job class using the configured class probabilities.
             internal int NextClassLevel()
             {
                 double u = classStream.NextDouble();
@@ -608,11 +640,13 @@ namespace SALTx.CPUS
                 return 1;
             }
 
+            // Samples the next exponential interarrival time.
             internal double NextInterarrival()
             {
                 return Exponential(interarrivalStream, configuration.MeanInterarrivalTime);
             }
 
+            // Samples a 3-Erlang service time by summing three exponential stages.
             internal double NextServiceTime(int classLevel)
             {
                 double stageMean = configuration.GetServiceMean(classLevel) / 3.0;
@@ -621,11 +655,13 @@ namespace SALTx.CPUS
                     + Exponential(serviceStreams[classLevel], stageMean);
             }
 
+            // Generates one exponential random variate with the given mean.
             private static double Exponential(Random random, double mean)
             {
                 return -mean * Math.Log(1.0 - random.NextDouble());
             }
 
+            // Creates separate deterministic seeds for each internal random stream.
             private static int MixSeed(int seed, int stream)
             {
                 unchecked

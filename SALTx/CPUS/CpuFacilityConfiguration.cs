@@ -1,5 +1,6 @@
 namespace SALTx.CPUS
 {
+    // Stores the input parameters for one CPU facility simulation scenario.
     public sealed class CpuFacilityConfiguration
     {
         private readonly double[] classProbabilities;
@@ -65,16 +66,19 @@ namespace SALTx.CPUS
 
         public string Name { get; }
 
+        // Returns the configured probability that an arriving job belongs to the given class.
         public double GetClassProbability(int classLevel)
         {
             return classProbabilities[classLevel];
         }
 
+        // Returns the configured mean 3-Erlang service time for the given class.
         public double GetServiceMean(int classLevel)
         {
             return serviceMeansByClass[classLevel];
         }
 
+        // Provides the assignment's original input parameters.
         public static CpuFacilityConfiguration Baseline()
         {
             return new CpuFacilityConfiguration(

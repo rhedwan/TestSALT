@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace SALTx.CPUS
 {
+    // Stores output statistics for one priority class in a completed simulation run.
     public sealed class CpuFacilityClassResult
     {
         internal CpuFacilityClassResult(
@@ -30,6 +31,7 @@ namespace SALTx.CPUS
         public double CpuBusyShare { get; }
     }
 
+    // Stores the complete output summary for one CPU facility simulation run.
     public sealed class CpuFacilityResult
     {
         internal CpuFacilityResult(

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace SALTx.CPUS
 {
+    // Lists the event types used by the CPU facility discrete-event simulation.
     internal enum FacilityEventType
     {
         Arrival,
@@ -9,6 +10,7 @@ namespace SALTx.CPUS
         EndService
     }
 
+    // Represents one scheduled future event in the simulation event list.
     internal sealed class ScheduledEvent
     {
         internal ScheduledEvent(long id, double time, FacilityEventType type, Job job)
@@ -30,11 +32,13 @@ namespace SALTx.CPUS
         internal FacilityEventType Type { get; }
     }
 
+    // Maintains the future-event list and returns events in chronological order.
     internal sealed class Scheduler
     {
         private readonly List<ScheduledEvent> events = new List<ScheduledEvent>();
         private long nextId;
 
+        // Adds a future event to the event list.
         internal ScheduledEvent Schedule(double time, FacilityEventType type, Job job = null)
         {
             ScheduledEvent scheduledEvent = new ScheduledEvent(nextId++, time, type, job);
@@ -42,12 +46,14 @@ namespace SALTx.CPUS
             return scheduledEvent;
         }
 
+        // Marks an event as canceled so it will be ignored when events are selected.
         internal void Cancel(ScheduledEvent scheduledEvent)
         {
             if (scheduledEvent != null)
                 scheduledEvent.Canceled = true;
         }
 
+        // Removes and returns the earliest non-canceled event.
         internal bool TryPopNext(out ScheduledEvent scheduledEvent)
         {
             int bestIndex = -1;

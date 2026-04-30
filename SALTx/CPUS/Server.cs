@@ -2,6 +2,7 @@ using SALT;
 
 namespace SALTx.CPUS
 {
+    // Represents the single CPU server and records busy-time statistics by job class.
     public class Server : SALT.Node
     {
         private readonly double[] busyTimeByClass = new double[5];
@@ -27,31 +28,37 @@ namespace SALTx.CPUS
             get { return CurrentJob != null; }
         }
 
+        // SALT node execution is not used because this runner manages events externally.
         public override Event[] Execute()
         {
             return new Event[0];
         }
 
+        // Returns no SALT statistics because this class records its own simulation totals.
         public override Stat[] FinalizeStats()
         {
             return new Stat[0];
         }
 
+        // Returns no initial SALT events because the custom scheduler initializes the run.
         public override Event[] Init()
         {
             return new Event[0];
         }
 
+        // Returns the total CPU time spent serving jobs from the specified class.
         internal double GetBusyTime(int classLevel)
         {
             return busyTimeByClass[classLevel];
         }
 
+        // Confirms that an end-service event still belongs to the current in-service job.
         internal bool IsCurrent(Job job)
         {
             return CurrentJob == job;
         }
 
+        // Starts service for a job and schedules its future completion event.
         internal void Start(Job job, double time, Scheduler scheduler)
         {
             CurrentJob = job;
@@ -60,6 +67,7 @@ namespace SALTx.CPUS
             pendingCompletion = scheduler.Schedule(time + job.RemainingServiceTime, FacilityEventType.EndService, job);
         }
 
+        // Completes the current job and updates CPU busy-time totals.
         internal Job CompleteCurrent(double time)
         {
             AccumulateBusyTime(time);
@@ -71,6 +79,7 @@ namespace SALTx.CPUS
             return completedJob;
         }
 
+        // Interrupts the current job, cancels its completion event, and preserves remaining service time.
         internal Job PreemptCurrent(double time, Scheduler scheduler)
         {
             scheduler.Cancel(pendingCompletion);
@@ -82,6 +91,7 @@ namespace SALTx.CPUS
             return preemptedJob;
         }
 
+        // Adds elapsed service time to utilization and class busy-share counters.
         private void AccumulateBusyTime(double time)
         {
             double elapsed = time - currentServiceStartedAt;
